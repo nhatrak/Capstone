@@ -16,7 +16,7 @@ st.set_page_config(layout="wide")
 from scipy.stats import ttest_ind
 
 # Read in data
-df = pd.read_csv(r"C:\Users\nhatrak\OneDrive - Educational Testing Service\DataScience_class\Capstone\data_capstone_dsa2021_2022.csv")
+df = pd.read_csv("data_capstone_dsa2021_2022.csv")
 
 # Cleaning up state column. First uppercase all for easier standardization
 df['state'] = df['state'].str.upper()
