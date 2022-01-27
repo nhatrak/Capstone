@@ -197,10 +197,6 @@ Gender_Pie2=pd.DataFrame(Gender_Pie)
 Gender_Pie2.reset_index(inplace=True)
 Gender_Pie2 = Gender_Pie2.rename(columns = {'index':'Gender','gender':'N'})
 Gender_Pie2.sort_values(by=['Gender'], inplace=True)
-#fig1, ax1 = plt.subplots()
-#Pie1=ax1.pie(Gender_Pie2.N, labels=Gender_Pie2.Gender, autopct='%1.0f%%', startangle=90)
-#ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-#ax1.set_title('Gender Percentage')
 Pie1=px.pie(Gender_Pie2, values='N',names='Gender',title='Gender Percentage')
 Pie1.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Pie1.update_traces(textinfo='label+percent')
@@ -215,11 +211,6 @@ State_Pie2_Top=State_Pie2[:11].copy()
 new_row = pd.DataFrame(data = {'State':['States less than N=30'],'N' : [State_Pie2['N'][11:].sum()]})
 State_Pie2_Top.sort_values(by=['State'], inplace=True)
 State_Pie3=pd.concat([State_Pie2_Top, new_row],ignore_index=True)
-
-# fig2, ax2 = plt.subplots()
-# Pie2=ax2.pie(State_Pie3.N, labels=State_Pie3.State, autopct='%1.0f%%', startangle=90,pctdistance=.8)
-# ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-# ax2.set_title('State Percentage')
 Pie2=px.pie(State_Pie3, values='N',names='State',labels='State', title='State Percentage')
 Pie2.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Pie2.update_traces(textinfo='label+percent')
@@ -231,10 +222,6 @@ Comp_Pie2=pd.DataFrame(Comp_Pie)
 Comp_Pie2.reset_index(inplace=True)
 Comp_Pie2 = Comp_Pie2.rename(columns = {'index':'Home_computer','home_computer':'N'})
 Comp_Pie2.sort_values(by=['Home_computer'], inplace=True)
-# fig3, ax3 = plt.subplots()
-# Pie3=ax3.pie(Comp_Pie2.N, labels=Comp_Pie2.Home_computer, autopct='%1.0f%%', startangle=90)
-# ax3.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-# ax3.set_title('Home Computer Percentage')
 Pie3=px.pie(Comp_Pie2, values='N',names='Home_computer',title='Home Computer Percentage')
 Pie3.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Pie3.update_traces(textinfo='label+percent')
@@ -246,25 +233,10 @@ Age_Pie2=pd.DataFrame(Age_Pie)
 Age_Pie2.reset_index(inplace=True)
 Age_Pie2 = Age_Pie2.rename(columns = {'index':'Age_Range','Age_Range':'N'})
 Age_Pie2.sort_values(by=['Age_Range'], inplace=True)
-# fig3, ax3 = plt.subplots()
-# Pie3=ax3.pie(Comp_Pie2.N, labels=Comp_Pie2.Home_computer, autopct='%1.0f%%', startangle=90)
-# ax3.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-# ax3.set_title('Home Computer Percentage')
 Pie4=px.pie(Age_Pie2, values='N',names='Age_Range',title='Age Range Percentage')
 Pie4.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Pie4.update_traces(textinfo='label+percent')
 Pie4.update_traces(sort=False) 
-
-# Not going with this option for demograhpics but may revisit if I want to display things side by side
-# col1, col2=st.columns([5,5]) 
-# option = st.selectbox('Select a Demographic to See Percentage Pie Chart',('Gender', 'State', 'Home Computer'))
-# with col1:
-#     if 'Gender' in option: st.pyplot(fig9)
-        
-# with col2:
-#     if 'Gender' in option: st.plotly_chart (Pie1, use_container_width=True)
-#     if 'State' in option: st.plotly_chart(Pie2, use_container_width=True)
-#     if 'Home Computer' in option: st.plotly_chart(Pie3, use_container_width=True)
 
 #produce 2 columns and have Gender/Home_computer side by side and age/states side by side   
 col1, col2=st.columns([5,5])
@@ -538,18 +510,7 @@ all_freq_mn_std = all_freq_mn_std[["Item", "Item_Score", "Frequency", "Percent",
 get_items=all_freq_mn_std['Item'].drop_duplicates()
 get_items.sort_values(ascending=True, inplace=True)
 get_item_list=get_items.tolist()
-# This is another option - didn't like this as much since it had all items selected right away
-# items = st.container()
-# all = st.checkbox("Select all", value=True)
- 
-# if all:
-#     selected_options = items.multiselect("Select one or more Items to see Item Statistics:",
-#         get_item_list, get_item_list)
-# else:
-#     selected_options =  items.multiselect("Select one or more Items to see Item Statistics:",
-#         get_item_list)
 
-# option_item_query = all_freq_mn_std.loc[all_freq_mn_std["Item"].isin(selected_options)]
 get_item_list2=[]
 get_item_list2=get_item_list[:]
 get_item_list2.append('Select all Items')
@@ -574,47 +535,7 @@ st.table(option_item_query.style.set_precision(2))
 st.markdown('## Table of Overall Item Pvalue and Correlations')
 st.table(option_item_query2.style.set_precision(2))
 
-#OLD way of doing table - like the st.table option better. keep code in case not using streamlit
-# plt.rcParams["figure.figsize"] = [10, 10]
-# plt.rcParams["figure.autolayout"] = True
-# fig, ax = plt.subplots()
-# # hide axes
-# fig.patch.set_visible(False)
-# ax.axis('off')
-# #ax.axis('tight')
-# tbl=ax.table(cellText=option_item_query.values, colLabels=option_item_query.columns, loc='center')
-# tbl.auto_set_font_size(False)
-# tbl.set_fontsize(10)
-# st.pyplot(fig)
 
-lenny = px.scatter(final_dataset, x="sum_score", y="rt_total")
-st.plotly_chart(lenny)
-
-for k in range(1,21):
-    time_means = final_dataset.groupby(['gs_%s'%k,'Age_Range'])['rt_total'].mean().reset_index()
-    time_means['Item'] = "gs_%s"%k
-    time_means = time_means.rename(columns={'gs_%s'%k: 'Item_Score'})
-    time_means['Answered'] = np.where(time_means['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
-    if k == 1:
-        Time_Gender_HomeComputer=time_means
-    else:
-        Time_Gender_HomeComputer=Time_Gender_HomeComputer.append(time_means)
-
-#time_means_query=time_means.loc[time_means['state_final'] == option]
-
-#fig4=px.bar(time_gender_means2_query,x='gender',y='rt_total',color='gender',title ="Mean Total Times by Gender and State")
-#fig4.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
-
-Scatter_Time_Gender_HomeComputer = px.scatter(Time_Gender_HomeComputer, x='Item', y='rt_total', color='Answered', facet_col=('Age_Range'),
-                    title="Total Time Mean by Item Score and Home Computer",
-                    labels={'Age_Range': 'Age_Range', 'rt_total':'Total Time Mean'})
-Scatter_Time_Gender_HomeComputer.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
-st.plotly_chart(Scatter_Time_Gender_HomeComputer)
-
-Hatrak = px.scatter(final_dataset, x=range(len(list(final_dataset["age"]))), y='age', facet_col=('home_computer'),
-                    title="do you work")
-Hatrak.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
-st.plotly_chart(Hatrak)
 
 
 
