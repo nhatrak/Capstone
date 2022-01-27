@@ -8,7 +8,7 @@ January 2022
 
 import pandas as pd
 import numpy as np
-#import seaborn as sb
+import seaborn as sb
 #import matplotlib.pyplot as plt
 import plotly.express as px
 import streamlit as st
@@ -449,22 +449,22 @@ corrs=final_dataset2.corr(method ='pearson')
 mask=np.zeros_like(corrs)
 mask[np.triu_indices_from(mask)] = True
 
-# fig=plt.figure(figsize=(7, 3))
-# sb.set(font_scale=.3)
-# heatmap=sb.heatmap(corrs, 
-#             vmin=-1,
-#             vmax=1,
-#             xticklabels=corrs.columns,
-#             yticklabels=corrs.columns,
-#             cmap='RdBu_r',
-#             mask=mask,
-#             annot=True,
-#             fmt='.2f',
-#             linewidth=2)
-# heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':10}, pad=12)
-# heatmap.set_xticklabels(heatmap.get_xmajorticklabels(), fontsize=4, rotation=30)
-# heatmap.set_yticklabels(heatmap.get_ymajorticklabels(), fontsize=4, rotation=0)
-# st.pyplot(fig)
+fig=plt.figure(figsize=(7, 3))
+sb.set(font_scale=.3)
+heatmap=sb.heatmap(corrs, 
+            vmin=-1,
+            vmax=1,
+            xticklabels=corrs.columns,
+            yticklabels=corrs.columns,
+            cmap='RdBu_r',
+            mask=mask,
+            annot=True,
+            fmt='.2f',
+            linewidth=2)
+heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':10}, pad=12)
+heatmap.set_xticklabels(heatmap.get_xmajorticklabels(), fontsize=4, rotation=30)
+heatmap.set_yticklabels(heatmap.get_ymajorticklabels(), fontsize=4, rotation=0)
+st.pyplot(fig)
 
 # =============================================================================
 # Item Statistics
