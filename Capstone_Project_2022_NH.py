@@ -14,6 +14,9 @@ import plotly.express as px
 import streamlit as st
 st.set_page_config(layout="wide")
 from scipy.stats import ttest_ind
+from scipy.stats import f_oneway 
+from scipy.stats import chi2_contingency
+import plotly.graph_objects as go
 
 # Read in data
 df = pd.read_csv("data_capstone_dsa2021_2022.csv")
@@ -187,6 +190,8 @@ st.markdown(Title1, unsafe_allow_html=True)
 Title2 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Breakdown of Demographic Variables</p>'
 st.markdown(Title2, unsafe_allow_html=True)
 
+st.markdown("---")
+
 # =============================================================================
 # DEMOGRAPHIC INFO
 # =============================================================================
@@ -250,10 +255,11 @@ with col3:
 with col4:
     st.plotly_chart(Pie2, use_container_width=True)
 
+st.markdown("---")
 # =============================================================================
 # Gender and Sum_Score
 # =============================================================================
-gender_means = final_dataset.groupby(['gender'])['sum_score'].mean().reset_index()
+gender_means = final_dataset.groupby(['gender'])['sum_score'].mean().round(2).reset_index()
 f_means = gender_means.loc[gender_means['gender'] == 'Female']
 m_means = gender_means.loc[gender_means['gender'] == 'Male']
 gender_means2=f_means.append(m_means)
@@ -267,7 +273,7 @@ Gender_Score_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yan
 
 t_stat, p = ttest_ind(final_dataset.query('gender=="Male"')['sum_score'], final_dataset.query('gender=="Female"')['sum_score'])
 
-Title3 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Sum_Score</p>'
+Title3 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Total Score</p>'
 st.markdown(Title3, unsafe_allow_html=True)
 
 col5, col6=st.columns(2)
@@ -276,17 +282,18 @@ with col5:
 with col6:
     st.plotly_chart(Gender_Score_Box)
     
-st.write("Is there a difference in sum_score between Male and Female?")
+st.write("**Is there a difference in sum_score between Male and Female?**")
 st.write("Ho: There is no difference  \n \
          H1: There is a difference")
-st.write("T_test - p_value: ",round(p,3))
+st.write("T_test - p_value: ",round(p,4))
 st.write("The p-value is less than 0.05, we reject the null hypothesis.  \n \
              There is a difference in sum_score between Male and Female")
-
+             
+st.markdown("---")
 # =============================================================================
 # Gender and Total Time
 # =============================================================================
-gender_means_time = final_dataset.groupby(['gender'])['rt_total'].mean().reset_index()
+gender_means_time = final_dataset.groupby(['gender'])['rt_total'].mean().round(2).reset_index()
 f_means_time = gender_means_time.loc[gender_means_time['gender'] == 'Female']
 m_means_time = gender_means_time.loc[gender_means_time['gender'] == 'Male']
 gender_means_time2=f_means_time.append(m_means_time)
@@ -300,25 +307,26 @@ Gender_Time_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanc
 
 t_stat2, p2 = ttest_ind(final_dataset.query('gender=="Male"')['rt_total'], final_dataset.query('gender=="Female"')['rt_total'])
 
-Title3 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Total Time</p>'
-st.markdown(Title3, unsafe_allow_html=True)  
+Title4 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Total Time</p>'
+st.markdown(Title4, unsafe_allow_html=True)  
 col7, col8=st.columns(2)
 with col7:
     st.plotly_chart(fig2, use_container_width=True)
 with col8:
     st.plotly_chart(Gender_Time_Box)
     
-st.write("Is there a difference in total time between Male and Female?")
+st.write("**Is there a difference in total time between Male and Female?**")
 st.write("Ho: There is no difference  \n \
             H1: There is a difference")
-st.write("T_test - p_value: ",round(p2,3))
+st.write("T_test - p_value: ",round(p2,4))
 st.write("The p-value is less than 0.05, we reject the null hypothesis.  \n \
              There is a difference in total time between Male and Female")
 
+st.markdown("---")
 # =============================================================================
-# Age_Group and Sum_Score
+# Age_Group and Sum_Score and total time
 # =============================================================================
-age_means = final_dataset.groupby(['gender'])['age'].mean().reset_index()
+age_means = final_dataset.groupby(['gender'])['age'].mean().round(2).reset_index()
 f_means_age = age_means.loc[age_means['gender'] == 'Female']
 m_means_age = age_means.loc[age_means['gender'] == 'Male']
 age_meanss2=f_means_age.append(m_means_age)
@@ -334,12 +342,12 @@ Gender_Age_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanch
 Total_scr_for_graphs = pd.DataFrame()
 Total_scr_for_graphs2=gender_means2.append(Total_scr_for_graphs)
 Total_scr_for_graphs2['Age_Range'] = "ALL"
-age_gender_scr_means = final_dataset.groupby(['gender', 'Age_Range'])['sum_score'].mean().reset_index()
+age_gender_scr_means = final_dataset.groupby(['gender', 'Age_Range'])['sum_score'].mean().round(2).reset_index()
 age_gender_scr_means2=age_gender_scr_means.append(Total_scr_for_graphs2)
 Gender_Age_Scr_Box=px.scatter(age_gender_scr_means2, x='Age_Range', y='sum_score', color='gender',  
             title="Total Score Mean by Age Group and Gender",
             category_orders = {"Age_Range" : [" Under 30", "30-39", "40-49", "50-59", "60+", "ALL"]}, 
-            labels={'gender': 'Gender', 'sum_score':'Total Score Mean'}, text=age_gender_scr_means2['sum_score'].round(2))
+            labels={'gender': 'Gender', 'sum_score':'Total Score Mean', 'Age_Range': 'Age Group'}, text='sum_score')
 Gender_Age_Scr_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Gender_Age_Scr_Box.update_traces(textposition='middle right')
 
@@ -347,36 +355,66 @@ Gender_Age_Scr_Box.update_traces(textposition='middle right')
 Total_times_for_graphs = pd.DataFrame()
 Total_times_for_graphs2=gender_means_time2.append(Total_times_for_graphs)
 Total_times_for_graphs2['Age_Range'] = "ALL"
-age_gender_time_means = final_dataset.groupby(['gender', 'Age_Range'])['rt_total'].mean().reset_index()
+age_gender_time_means = final_dataset.groupby(['gender', 'Age_Range'])['rt_total'].mean().round(2).reset_index()
 age_gender_time_means2=age_gender_time_means.append(Total_times_for_graphs2)
 Gender_Age_time_Box=px.scatter(age_gender_time_means2, x='Age_Range', y='rt_total', color='gender',  
-            title="Total Time Mean by Age Group and Gender",
+            title="Total Time Mean by Age Group and Gender", 
             category_orders = {"Age_Range" : [" Under 30", "30-39", "40-49", "50-59", "60+", "ALL"]}, 
-            labels={'gender': 'Gender', 'rt_total':'Total Time Mean'}, text=age_gender_time_means2['rt_total'].round(2))
+            labels={'gender': 'Gender', 'rt_total':'Total Time Mean', 'Age_Range': 'Age Group'}, text='rt_total')
 Gender_Age_time_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Gender_Age_time_Box.update_traces(textposition='middle right')
 
-Title33 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Age</p>'
-st.markdown(Title33, unsafe_allow_html=True)
 
-col5a, col6a=st.columns(2)
-with col5a:
+Title5 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Gender and Age</p>'
+st.markdown(Title5, unsafe_allow_html=True)
+
+col9, col10=st.columns(2)
+with col9:
     st.plotly_chart(fig11, use_container_width=True)
-with col6a:
+with col10:
     st.plotly_chart(Gender_Age_Box)
+
+df_anova = final_dataset[['sum_score','Age_Range']]
+grps = pd.unique(final_dataset.Age_Range.values)
+d_data = {grp:df_anova['sum_score'][df_anova.Age_Range == grp] for grp in grps}
+F3, p3 = f_oneway(d_data[" Under 30"], d_data["30-39"], d_data["40-49"],d_data["50-59"],d_data["60+"])
+
+df_anova2 = final_dataset[['rt_total','Age_Range']]
+grps2 = pd.unique(final_dataset.Age_Range.values)
+d_data2 = {grp:df_anova2['rt_total'][df_anova2.Age_Range == grp] for grp in grps2}
+F4, p4 = f_oneway(d_data2[" Under 30"], d_data2["30-39"], d_data2["40-49"],d_data2["50-59"],d_data2["60+"])
+
+
+col11, col12=st.columns(2)
+with col11:
+    st.write("**Is there a difference in total scores between the Age Groups?**")
+    st.write("Ho: There is no difference  \n \
+            H1: There is a difference")
+    st.write("Anova - F statistic: ",round(F3,4))
+    st.write("Anova - p_value: ",round(p3,4))
+    st.write("The p-value is less than 0.05, we reject the null hypothesis.  \n \
+             There is a difference in total scores between the Age Groups")
+with col12:
+    st.write("**Is there a difference in total times between the Age Groups?**")
+    st.write("Ho: There is no difference  \n \
+            H1: There is a difference")
+    st.write("Anova - F statistic: ",round(F4,4))
+    st.write("Anova - p_value: ",round(p4,4))
+    st.write("The p-value is less than 0.05, we reject the null hypothesis.  \n \
+             There is a difference in total times between the Age Groups")
     
-col5b, col6b=st.columns(2)
-with col5b:
+col13, col14=st.columns(2)
+with col13:
     st.plotly_chart(Gender_Age_Scr_Box, use_container_width=True)
-with col6b:
+with col14:
     st.plotly_chart(Gender_Age_time_Box, use_container_width=True)
 
-    
+st.markdown("---")   
 # =============================================================================
 # STATES and Sum_Score and Total Time
 # =============================================================================
-Title4 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining States Mean Sum_Score and Mean Total Time by Gender</p>'
-st.markdown(Title4, unsafe_allow_html=True) 
+Title6 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining States Total Score Mean and Total Time Mean by Gender</p>'
+st.markdown(Title6, unsafe_allow_html=True) 
 get_states=final_dataset['state_final'].drop_duplicates()
 get_states.sort_values(ascending=True, inplace=True)
 option = st.selectbox('Select a State to See Mean Scores by Gender and Mean Total Times by Gender',get_states)
@@ -399,20 +437,21 @@ fig4=px.bar(time_gender_means2_query,x='gender',y='rt_total',color='gender',titl
             labels={'gender': 'Gender', 'rt_total':'Total Time Mean'})
 fig4.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 
-col9, col10=st.columns(2)
-with col9:
+col15, col16=st.columns(2)
+with col15:
     st.plotly_chart(fig3, use_container_width=True)
-with col10:
+with col16:
     st.plotly_chart(fig4, use_container_width=True)
 
+st.markdown("---")
 # =============================================================================
 # Item Correlation
 # =============================================================================
-Title5 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Item Scores and Sum_Score Correlation</p>'
-st.markdown(Title5, unsafe_allow_html=True)  
-Title6 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 15px;">Looking at sum_score row, you can see gs_4, gs_7, gs_10, and gs_12 are the only items over .50. <br> \
+Title7 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Item Scores and Total Score Correlation</p>'
+st.markdown(Title7, unsafe_allow_html=True)  
+Title8 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 15px;">Looking at sum_score row, you can see gs_4, gs_7, gs_10, and gs_12 are the only items over .50. <br> \
             gs_7 has the highest correlations with sum_score at .58 </p>'
-st.markdown(Title6, unsafe_allow_html=True)  
+st.markdown(Title8, unsafe_allow_html=True)  
 
 #Get just item scores and sum_score for correlation heat matrix
 final_dataset2=final_dataset.iloc[:, 20:] 
@@ -438,6 +477,7 @@ heatmap.set_xticklabels(heatmap.get_xmajorticklabels(), fontsize=4, rotation=30)
 heatmap.set_yticklabels(heatmap.get_ymajorticklabels(), fontsize=4, rotation=0)
 st.pyplot(fig)
 
+st.markdown("---")
 # =============================================================================
 # Item Statistics
 # =============================================================================
@@ -492,16 +532,17 @@ p_val_corr=all_pval.merge(corrs_only2,left_on='Item', right_on='Item')
 p_val_corr.drop(columns=['Item_Score'], inplace=True) 
 p_val_corr=p_val_corr[["Item","Pvalue",'Correlation']]
 #get table of stats to print
-st.markdown('## Examining Item Statistics')
+Title9 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;">Examining Item Statistics</p>'
+st.markdown(Title9, unsafe_allow_html=True) 
 # =============================================================================
 Item_Box=px.box(p_val_corr, y='Pvalue', points='all', hover_data=["Item", "Pvalue"], title="Box plot of Pvalue")
 Item_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 Item_Box2=px.box(p_val_corr, y='Correlation', points='all', hover_data=["Item", "Correlation"], title="Box plot of Correlation")
 Item_Box2.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
-col11, col12=st.columns(2)
-with col11:
+col17, col18=st.columns(2)
+with col17:
     st.plotly_chart(Item_Box, use_container_width=True)
-with col12:
+with col18:
     st.plotly_chart(Item_Box2, use_container_width=True)
 # =============================================================================
 #reorder columns
@@ -535,13 +576,211 @@ st.table(option_item_query.style.set_precision(2))
 st.markdown('## Table of Overall Item Pvalue and Correlations')
 st.table(option_item_query2.style.set_precision(2))
 
+st.markdown("---")
+# =============================================================================
+# Total Times Means by Overall and Demographics
+# =============================================================================
+Title10 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;"> Examining Item Score for Overall, Gender, Age, and Home Computer </p>'
+            
+st.markdown(Title10, unsafe_allow_html=True) 
+for k in range(1,21):
+    time_means = final_dataset.groupby(['gs_%s'%k,'home_computer'])['rt_total'].mean().round(2).reset_index()
+    time_means['Item'] = "gs_%s"%k
+    time_means = time_means.rename(columns={'gs_%s'%k: 'Item_Score'})
+    time_means['Answered'] = np.where(time_means['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    time_means2 = final_dataset.groupby(['gs_%s'%k,'gender'])['rt_total'].mean().round(2).reset_index()
+    time_means2['Item'] = "gs_%s"%k
+    time_means2 = time_means2.rename(columns={'gs_%s'%k: 'Item_Score'})
+    time_means2['Answered'] = np.where(time_means2['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    time_means3 = final_dataset.groupby(['gs_%s'%k,'Age_Range'])['rt_total'].mean().round(2).reset_index()
+    time_means3['Item'] = "gs_%s"%k
+    time_means3 = time_means3.rename(columns={'gs_%s'%k: 'Item_Score'})
+    time_means3['Answered'] = np.where(time_means3['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    time_means4 = final_dataset.groupby(['gs_%s'%k])['rt_total'].mean().round(2).reset_index()
+    time_means4['Item'] = "gs_%s"%k
+    time_means4 = time_means4.rename(columns={'gs_%s'%k: 'Item_Score'})
+    time_means4['Answered'] = np.where(time_means4['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    if k == 1:
+        Time_HomeComputer=time_means
+        Time_Gender=time_means2
+        Time_Age=time_means3
+        Time_Total=time_means4
+    else:
+        Time_HomeComputer=Time_HomeComputer.append(time_means)
+        Time_Gender=Time_Gender.append(time_means2)
+        Time_Age=Time_Age.append(time_means3)
+        Time_Total=Time_Total.append(time_means4)
+        
+Scatter_Time_Total = px.scatter(Time_Total, x='Item', y='rt_total', color='Answered',
+                    title="Total Time Mean by Item Score - Overall",
+                    labels={'rt_total':'Total Time Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_Time_Total.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_Time_Total.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_Time_Gender = px.scatter(Time_Gender, x='Item', y='rt_total', color='Answered', facet_col=('gender'),
+                    title="Total Time Mean by Item Score - Gender",
+                    labels={'gender': 'Gender', 'rt_total':'Total Time Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_Time_Gender.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_Time_Gender.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_Time_Age = px.scatter(Time_Age, x='Item', y='rt_total', color='Answered', facet_col=('Age_Range'),
+                    facet_col_wrap=3, title="Total Time Mean by Item Score - Age",
+                    labels={'Age_Range': 'Home Age_Range', 'rt_total':'Total Time Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_Time_Age.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_Time_Age.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_Time_HomeComputer = px.scatter(Time_HomeComputer, x='Item', y='rt_total', color='Answered', facet_col=('home_computer'),
+                    title="Total Time Mean by Item Score - Home Computer",
+                    labels={'home_computer': 'Home Computer', 'rt_total':'Total Time Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_Time_HomeComputer.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_Time_HomeComputer.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+# =============================================================================
+# Total Score Means by Overall and Demographics
+# =============================================================================
+for k in range(1,21):
+    scr_means = final_dataset.groupby(['gs_%s'%k,'home_computer'])['sum_score'].mean().round(2).reset_index()
+    scr_means['Item'] = "gs_%s"%k
+    scr_means = scr_means.rename(columns={'gs_%s'%k: 'Item_Score'})
+    scr_means['Answered'] = np.where(scr_means['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    scr_means2 = final_dataset.groupby(['gs_%s'%k,'gender'])['sum_score'].mean().round(2).reset_index()
+    scr_means2['Item'] = "gs_%s"%k
+    scr_means2 = scr_means2.rename(columns={'gs_%s'%k: 'Item_Score'})
+    scr_means2['Answered'] = np.where(scr_means2['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    scr_means3 = final_dataset.groupby(['gs_%s'%k,'Age_Range'])['sum_score'].mean().round(2).reset_index()
+    scr_means3['Item'] = "gs_%s"%k
+    scr_means3 = scr_means3.rename(columns={'gs_%s'%k: 'Item_Score'})
+    scr_means3['Answered'] = np.where(scr_means3['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    scr_means4 = final_dataset.groupby(['gs_%s'%k])['sum_score'].mean().round(2).reset_index()
+    scr_means4['Item'] = "gs_%s"%k
+    scr_means4 = scr_means4.rename(columns={'gs_%s'%k: 'Item_Score'})
+    scr_means4['Answered'] = np.where(scr_means4['Item_Score']== 1, 'Answered_Right', 'Answered_Wrong')
+    if k == 1:
+        scr_HomeComputer=scr_means
+        scr_Gender=scr_means2
+        scr_Age=scr_means3
+        scr_Total=scr_means4
+    else:
+        scr_HomeComputer=scr_HomeComputer.append(scr_means)
+        scr_Gender=scr_Gender.append(scr_means2)
+        scr_Age=scr_Age.append(scr_means3)
+        scr_Total=scr_Total.append(scr_means4)
+        
+Scatter_scr_Total = px.scatter(scr_Total, x='Item', y='sum_score', color='Answered',
+                    title="Total Score Mean by Item Score - Overall",
+                    labels={'sum_score':'Total Score Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_scr_Total.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_scr_Total.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_scr_Gender = px.scatter(scr_Gender, x='Item', y='sum_score', color='Answered', facet_col=('gender'),
+                    title="Total Score Mean by Item Score - Gender",
+                    labels={'gender': 'Gender', 'sum_score':'Total Score Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_scr_Gender.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_scr_Gender.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_scr_Age = px.scatter(scr_Age, x='Item', y='sum_score', color='Answered', facet_col=('Age_Range'),
+                    facet_col_wrap=3, title="Total Score Mean by Item Score - Age",
+                    labels={'Age_Range': 'Home Age_Range', 'sum_score':'Total Score Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_scr_Age.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_scr_Age.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+Scatter_scr_HomeComputer = px.scatter(scr_HomeComputer, x='Item', y='sum_score', color='Answered', facet_col=('home_computer'),
+                    title="Total Score Mean by Item Score - Home Computer",
+                    labels={'home_computer': 'Home Computer', 'sum_score':'Total Score Mean'},
+                    category_orders = {"Item" : ["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"]},
+                    height=500, width=900)
+Scatter_scr_HomeComputer.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+Scatter_scr_HomeComputer.update_xaxes(tickvals=["gs_1", "gs_2", "gs_3", "gs_4", "gs_5", "gs_6","gs_7", "gs_8", "gs_9", "gs_10",
+                                                 "gs_11", "gs_12", "gs_13", "gs_14", "gs_15", "gs_16","gs_17", "gs_18", "gs_19", "gs_20"])
+
+# create radio button to select sum_score or rt_total
+cola, colb,colc=st.columns(3)
+with colb:
+    option_scatters = st.radio('Select One to see Scatterplots',('Total Score', 'Total Time'))
+    
+col19, col20=st.columns(2)
+with col19:
+    if 'Total Score' in option_scatters: st.plotly_chart(Scatter_scr_Total, use_container_width=True)
+    if 'Total Time' in option_scatters: st.plotly_chart(Scatter_Time_Total, use_container_width=True)
+with col20:
+    if 'Total Score' in option_scatters: st.plotly_chart(Scatter_scr_Gender, use_container_width=True)
+    if 'Total Time' in option_scatters: st.plotly_chart(Scatter_Time_Gender, use_container_width=True)
+
+col21, col22=st.columns(2)
+with col21:
+    if 'Total Score' in option_scatters: st.plotly_chart(Scatter_scr_Age, use_container_width=True)
+    if 'Total Time' in option_scatters: st.plotly_chart(Scatter_Time_Age, use_container_width=True)
+with col22:
+    if 'Total Score' in option_scatters: st.plotly_chart(Scatter_scr_HomeComputer, use_container_width=True)
+    if 'Total Time' in option_scatters: st.plotly_chart(Scatter_Time_HomeComputer, use_container_width=True)
+
+st.markdown("---")
+
+Title11 = '<p style="font-family:sans-serif; text-align: center; color:Green; font-size: 30px;"> Examining Total Score Means by Overall and Gender for Each US State </p>'
+st.markdown(Title11, unsafe_allow_html=True) 
 
 
+State_ForMap = final_dataset.groupby(["state_final"])["sum_score"].describe().round(2).reset_index()
+State_ForMap1 = go.Figure(data=go.Choropleth(locations = State_ForMap['state_final'],z = State_ForMap['mean'],
+locationmode = 'USA-states', # set of locations match entries in `locations`
+colorscale = 'sunset',colorbar_title = "Total Score Mean"))
+State_ForMap1.update_layout(dragmode = False,title_text = 'Total Score Mean by US State',geo_scope='usa',
+                            title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 
+StateGen_ForMap = final_dataset.groupby(["state_final","gender"])["sum_score"].describe().round(2).reset_index()
+StateGen_ForMapF = StateGen_ForMap.loc[StateGen_ForMap['gender'] == 'Female']
+StateGen_ForMapM = StateGen_ForMap.loc[StateGen_ForMap['gender'] == 'Male']
+StateGen_ForMap1_F = go.Figure(data=go.Choropleth(locations = StateGen_ForMapF['state_final'],z = StateGen_ForMapF['mean'],
+locationmode = 'USA-states', # set of locations match entries in `locations`
+colorscale = 'sunset',colorbar_title = "Total Score Mean"))
+StateGen_ForMap1_F.update_layout(dragmode = False,title_text = 'Total Score Mean by US State - Gender:  Female',geo_scope='usa',
+                                 title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
+StateGen_ForMap1_M = go.Figure(data=go.Choropleth(locations = StateGen_ForMapM['state_final'],z = StateGen_ForMapM['mean'],
+locationmode = 'USA-states', # set of locations match entries in `locations`
+colorscale = 'sunset',colorbar_title = "Total Score Mean"))
+StateGen_ForMap1_M.update_layout(dragmode = False,title_text = 'Total Score Mean by US State - Gender:  Male',geo_scope='usa',
+                                 title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
 
+cold, cole,colf=st.columns(3)
+with cole:
+    st.plotly_chart(State_ForMap1)
 
+col23, col24=st.columns(2)
+with col23:
+    st.plotly_chart(StateGen_ForMap1_F)
+with col24:
+    st.plotly_chart(StateGen_ForMap1_M)
 
-
-
-
-
+col25,col26,col27 = st.columns(3)
+clicked = c26.button('You have reached the end - Click to Celebrate!')
+if clicked:
+    st.balloons()
