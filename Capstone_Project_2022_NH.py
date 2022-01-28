@@ -350,7 +350,7 @@ Total_times_for_graphs2['Age_Range'] = "ALL"
 age_gender_time_means = final_dataset.groupby(['gender', 'Age_Range'])['rt_total'].mean().reset_index()
 age_gender_time_means2=age_gender_time_means.append(Total_times_for_graphs2)
 Gender_Age_time_Box=px.scatter(age_gender_time_means2, x='Age_Range', y='rt_total', color='gender',  
-            title="Total Score Mean by Age Group and Gender",
+            title="Total Time Mean by Age Group and Gender",
             category_orders = {"Age_Range" : [" Under 30", "30-39", "40-49", "50-59", "60+", "ALL"]}, 
             labels={'gender': 'Gender', 'rt_total':'Total Time Mean'}, text=age_gender_time_means2['rt_total'].round(2))
 Gender_Age_time_Box.update_layout(title = {'y':0.9,'x':0.5,'xanchor': 'center','yanchor': 'top'})
