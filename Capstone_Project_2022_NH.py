@@ -779,8 +779,3 @@ with col23:
     st.plotly_chart(StateGen_ForMap1_F)
 with col24:
     st.plotly_chart(StateGen_ForMap1_M)
-
-col25,col26,col27 = st.columns(3)
-clicked = c26.button('You have reached the end - Click to Celebrate!')
-if clicked:
-    st.balloons()
